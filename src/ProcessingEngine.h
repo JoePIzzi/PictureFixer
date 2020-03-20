@@ -3,22 +3,26 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 
 #include <wx/types.h>
 #include <wx/thread.h>
 
-#include "BufferType.h"
 #include "TagData.h"
+
+class MyPictureModel;
 
 class ProcessingEngine
 {
 public:
     typedef std::vector<wxThread*> ThreadArrayType;
+    typedef std::vector<wxByte> BufferType;
 
-    ProcessingEngine();
+    ProcessingEngine( MyPictureModel* model_i );
     ~ProcessingEngine();
-    void ProcessDir( const std::string& parent_i, const std::string& directory );
-    void ProcessFile( const std::string& parent_i, const std::string& fileName_i );
+    void StartProcessing( std::string directory );
+    void ProcessDir( wxThread* owningThread_i, std::string parent_i, std::string directory );
+    void ProcessFile( std::string parent_i, std::string fileName_i );
 
     typedef std::vector<TagData> TagListType;
 
@@ -28,6 +32,8 @@ private:
     static constexpr int maxThreads = 10;
     std::string defaultFileMask;
     wxSemaphore semaphore;
+    wxEvtHandler* handler;
+    MyPictureModel* model;
 };
 
 #endif

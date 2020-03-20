@@ -10,10 +10,12 @@
 #endif
 
 #include "ProcessingEngine.h"
-#include "MyWorkerThread.h"
+#include "MyFileWorker.h"
 
-MyWorkerThread::MyWorkerThread( ProcessingEngine* handler_i, const std::string& parent_i, const std::string& filename_i,
-    wxSemaphore& semaphore_i ) :
+MyFileWorker::MyFileWorker( ProcessingEngine* handler_i, 
+                            std::string parent_i, 
+                            std::string filename_i, 
+                            wxSemaphore& semaphore_i ) :
     wxThread( wxTHREAD_JOINABLE ),
     semaphore( semaphore_i ),
     handler( handler_i ),
@@ -22,7 +24,7 @@ MyWorkerThread::MyWorkerThread( ProcessingEngine* handler_i, const std::string& 
 {
 }
 
-wxThread::ExitCode MyWorkerThread::Entry()
+wxThread::ExitCode MyFileWorker::Entry()
 {
     handler->ProcessFile( parent, filename );
     semaphore.Post();

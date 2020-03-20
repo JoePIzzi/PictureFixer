@@ -24,7 +24,8 @@ IMPLEMENT_APP( PictureFixerApp )
 
 bool PictureFixerApp::OnInit()
 {
-    MainWindow* mainWindow = new MainWindow( theEngine );
+    theModel = new MyPictureModel();
+    MainWindow* mainWindow = new MainWindow( theModel );
 
     mainWindow->Show( true );
 

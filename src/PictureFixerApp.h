@@ -10,7 +10,10 @@
 
 #include <wx/app.h>
 #include <wx/thread.h>
-#include "ProcessingEngine.h"
+
+#include <memory>
+
+#include "MyPictureModel.h"
 
 class PictureFixerApp : public wxApp
 {
@@ -22,7 +25,7 @@ public:
     wxSemaphore allDoneSemaphore;
 
 private:
-    ProcessingEngine theEngine;
+    MyPictureModel* theModel;
     bool shuttingDown;
 }; // class PictureFixerApp
 

@@ -13,9 +13,24 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Models">
+      <UniqueIdentifier>{1df8bdef-2079-495a-8790-ebfa0ffe9f47}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="MyFileDataNode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="MainWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MyDirWorker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MyFileWorker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MyPictureModel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PictureFixerApp.cpp">
@@ -24,21 +39,39 @@
     <ClCompile Include="ExifTool.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="JPEG_Tag.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="ProcessingEngine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TagData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="JPEG_Tag.cpp">
+    <ClCompile Include="ThreadInfo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MyWorkerThread.cpp">
+    <ClCompile Include="MyContainerNode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="MyPictureNodeInterface.h">
+      <Filter>Models</Filter>
+    </ClInclude>
+    <ClInclude Include="MyFileDataNode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="MainWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MyDirWorker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MyFileWorker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MyPictureModel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PictureFixerApp.h">
@@ -47,19 +80,19 @@
     <ClInclude Include="ExifTool.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="JPEG_Tag.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="ProcessingEngine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="TagData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="BufferType.h">
+    <ClInclude Include="ThreadInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="JPEG_Tag.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MyWorkerThread.h">
+    <ClInclude Include="MyContainerNode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

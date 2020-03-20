@@ -32,3 +32,13 @@ void TagData::setTag( wxByte identifier_i )
 {
     tag = JPEG_Tag( identifier_i );
 }
+
+std::string TagData::to_string() const
+{
+    std::string data( std::to_string( position ) );
+    data.append( ": " );
+    data.append( tag.to_string() );
+    data.append( ", " );
+    data.append( std::to_string( length ) );
+    return data;
+}

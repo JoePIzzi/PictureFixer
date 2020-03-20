@@ -3,6 +3,9 @@
 
 #include <wx/types.h>
 
+#include <string>
+#include <vector>
+
 class JPEG_Tag
 {
 public:
@@ -23,7 +26,6 @@ public:
         DifferentialArithmeticSequentialDCT = 0xCD,
         DifferentialArithmeticProgressiveDCT = 0xCE,
         DifferentialArithmeticLosslessDCT = 0xCF,
-        DefineHuffmanTable = 0xC4,
         DefineArithmeticCoding = 0xCC,
         RST0 = 0xD0,
         RST1 = 0xD1,
@@ -80,6 +82,7 @@ public:
     ~JPEG_Tag() = default;
 
     bool hasLength() const { return needsLength; }
+    std::string to_string() const;
 
 private:
     bool determineNeedsLength( Marker_values tag_i );

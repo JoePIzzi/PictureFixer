@@ -1,10 +1,11 @@
 #ifndef TagData_H
 #define TagData_H
 
-#include "BufferType.h"
 #include "JPEG_Tag.h"
 
 #include <wx/types.h>
+
+#include <string>
 
 class TagData
 {
@@ -21,6 +22,7 @@ public:
     void setLength( int length_i ) { length = length_i; }
     void setTag( wxByte identifier_i );
     void setBad() { bad = true; }
+    std::string to_string() const;
 
 private:
     int position;

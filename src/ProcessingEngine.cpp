@@ -15,16 +15,19 @@
 #include "ProcessingEngine.h"
 #include "JPEG_Tag.h"
 #include "TagData.h"
-#include "MyWorkerThread.h"
+#include "MyDirWorker.h"
+#include "MyFileWorker.h"
 #include "PictureFixerApp.h"
-#include "MainWindow.h"
+#include "MyPictureModel.h"
+#include "ThreadInfo.h"
 
 #include <algorithm>
 #include <utility>
 
-ProcessingEngine::ProcessingEngine() :
+ProcessingEngine::ProcessingEngine( MyPictureModel* model_i ) :
     defaultFileMask( "*.jpg" ),
-    semaphore( maxThreads, maxThreads )
+    semaphore( maxThreads, maxThreads ),
+    model( model_i )
 {
 }
 
@@ -32,17 +35,25 @@ ProcessingEngine::~ProcessingEngine()
 {
 }
 
-void ProcessingEngine::ProcessDir( const std::string& parent_i, const std::string& directory_i )
+void ProcessingEngine::StartProcessing( std::string directory )
+{
+    std::string noParent;
+    ProcessDir( nullptr, noParent, directory );
+    //MyDirWorker* newThread = new MyDirWorker( *this, noParent, directory );
+    //newThread->Run();
+}
+
+void ProcessingEngine::ProcessDir( wxThread* owningThread_i, std::string parent_i, std::string directory_i )
 {
     if ( wxDir::Exists( directory_i ) )
     {
         wxDir dir( directory_i );
         if ( dir.IsOpened() )
         {
-            wxThreadEvent* myEvent = new wxThreadEvent( EVT_ADD_DIRECTORY_EVENT );
-            myEvent->SetPayload( &std::make_pair( parent_i, directory_i ) );
-            wxGetApp().QueueEvent( myEvent );
-            //wxYield();
+            //if ( parent_i.length() > 0 )
+            {
+                model->AddChildContainer( parent_i, directory_i );
+            }
             if ( dir.HasSubDirs() )
             {
                 wxString dirName;
@@ -54,36 +65,41 @@ void ProcessingEngine::ProcessDir( const std::string& parent_i, const std::strin
                         continue;
                     }
                     dirName = directory_i + wxFileName::GetPathSeparator() + dirName;
-                    ProcessDir( directory_i, dirName );
+                    ProcessDir( owningThread_i, directory_i, dirName );
                 } while ( dir.GetNext( &dirName ) );
             }
 
-            if ( dir.HasFiles() )
-            {
-                wxString fileName;
-                dir.GetFirst( &fileName, defaultFileMask );
-                do
-                {
-                    fileName = directory_i + wxFileName::GetPathSeparator() + fileName;
-                    MyWorkerThread* newThread = new MyWorkerThread( this, parent_i, fileName, semaphore );
-                    semaphore.Wait();
-                    newThread->Run();
-                } while ( dir.GetNext( &fileName ) );
-            }
+            //if ( dir.HasFiles() )
+            //{
+            //    wxString fileName;
+            //    dir.GetFirst( &fileName, defaultFileMask );
+            //    do
+            //    {
+            //        // check if just this thread was asked to exit
+            //        if ( owningThread_i->TestDestroy() )
+            //            break;
+
+            //        fileName = directory_i + wxFileName::GetPathSeparator() + fileName;
+            //        MyFileWorker* newThread = new MyFileWorker( this, parent_i, fileName, semaphore );
+            //        semaphore.Wait();
+            //        newThread->Run();
+            //    } while ( dir.GetNext( &fileName ) );
+            //}
         }
     }
 }
 
-void ProcessingEngine::ProcessFile( const std::string& parent_i, const std::string& fileName_i )
+void ProcessingEngine::ProcessFile( std::string parent_i, std::string fileName_i )
 {
     if ( wxFile::Exists( fileName_i ) )
     {
         wxFile file( fileName_i );
         if ( file.IsOpened() )
         {
-            wxThreadEvent* myFileEvent = new wxThreadEvent( EVT_ADD_FILE_EVENT );
-            myFileEvent->SetPayload( &std::make_pair( parent_i, fileName_i ) );
-            wxGetApp().QueueEvent( myFileEvent );
+            //wxThreadEvent myFileEvent( wxEVT_THREAD, wxEVT_ADD_FILE_EVENT );
+            //ThreadInfo* fileEntry = new ThreadInfo( parent_i, fileName_i );
+            //myFileEvent.SetPayload( fileEntry );
+            //wxGetApp().QueueEvent( myFileEvent.Clone() );
             //wxYield();
             wxFileOffset length = file.Length();
             BufferType buffer( length );
@@ -92,9 +108,10 @@ void ProcessingEngine::ProcessFile( const std::string& parent_i, const std::stri
             wxASSERT( file.Eof() );
             std::vector<TagData> tagList;
             ProcessData( buffer, tagList );
-            wxThreadEvent* myDataEvent = new wxThreadEvent( EVT_ADD_DATA_EVENT );
-            myDataEvent->SetPayload( &std::make_pair( fileName_i, tagList ) );
-            wxGetApp().QueueEvent( myDataEvent );
+            //wxThreadEvent myDataEvent( wxEVT_THREAD, wxEVT_ADD_DATA_EVENT );
+            //ThreadInfo* fileData = new ThreadInfo( fileName_i, tagList );
+            //myDataEvent.SetPayload( fileData );
+            //wxGetApp().QueueEvent( myDataEvent.Clone() );
             //wxYield();
         }
     }
