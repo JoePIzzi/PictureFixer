@@ -22,12 +22,45 @@
 
 IMPLEMENT_APP( PictureFixerApp )
 
+wxDEFINE_EVENT( wxEVT_ITEM_ADDED_EVENT, wxThreadEvent );
+wxDEFINE_EVENT( wxEVT_THREAD_EXIT, wxThreadEvent );
+
+BEGIN_EVENT_TABLE( PictureFixerApp, wxApp )
+    EVT_THREAD( wxEVT_ITEM_ADDED_EVENT, PictureFixerApp::AddItem )
+    EVT_THREAD( wxEVT_THREAD_EXIT, PictureFixerApp::processingDone )
+END_EVENT_TABLE()
+
 bool PictureFixerApp::OnInit()
 {
+    if ( !wxApp::OnInit() )
+    {
+        return false;
+    }
+
     theModel = new MyPictureModel();
-    MainWindow* mainWindow = new MainWindow( theModel );
+    mainWindow = new MainWindow( theModel );
 
     mainWindow->Show( true );
 
     return true;
+}
+
+wxFrame* PictureFixerApp::getMainWindow()
+{
+    return mainWindow;
+}
+
+void PictureFixerApp::AddItem( wxThreadEvent& event )
+{
+    mainWindow->AddItem( event );
+}
+
+void PictureFixerApp::postShutdown()
+{
+    shuttingDown = true;
+}
+
+void PictureFixerApp::processingDone( wxThreadEvent& )
+{
+    mainWindow->processingDone();
 }

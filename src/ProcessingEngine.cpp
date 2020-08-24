@@ -23,9 +23,13 @@
 
 #include <algorithm>
 #include <utility>
+#include "FileProcessor.h"
+
+#include "MemDbg.h"
 
 ProcessingEngine::ProcessingEngine( MyPictureModel* model_i ) :
     defaultFileMask( "*.jpg" ),
+    fix( false ),
     semaphore( maxThreads, maxThreads ),
     model( model_i )
 {
@@ -35,12 +39,13 @@ ProcessingEngine::~ProcessingEngine()
 {
 }
 
-void ProcessingEngine::StartProcessing( std::string directory )
+void ProcessingEngine::StartProcessing( std::string directory, bool fix_i )
 {
+    fix = fix_i;
     std::string noParent;
-    ProcessDir( nullptr, noParent, directory );
-    //MyDirWorker* newThread = new MyDirWorker( *this, noParent, directory );
-    //newThread->Run();
+    //ProcessDir( nullptr, noParent, directory );
+    MyDirWorker* newThread = new MyDirWorker( *this, noParent, directory );
+    newThread->Run();
 }
 
 void ProcessingEngine::ProcessDir( wxThread* owningThread_i, std::string parent_i, std::string directory_i )
@@ -50,16 +55,23 @@ void ProcessingEngine::ProcessDir( wxThread* owningThread_i, std::string parent_
         wxDir dir( directory_i );
         if ( dir.IsOpened() )
         {
-            //if ( parent_i.length() > 0 )
-            {
-                model->AddChildContainer( parent_i, directory_i );
-            }
+            wxLogStatus( "%d, Processing Directory %s", wxThread::GetCurrentId(), directory_i );
+            //model->AddChildContainer( parent_i, directory_i );
             if ( dir.HasSubDirs() )
             {
                 wxString dirName;
                 dir.GetFirst( &dirName, wxEmptyString, wxDIR_DIRS );
                 do
                 {
+                    {
+                        wxCriticalSectionLocker locker( wxGetApp().criticalSection );
+                        if ( wxGetApp().isShuttingDown() )
+                        {
+                            // Aplication is shutting down. Just exit.
+                            return;
+                        }
+                    }
+
                     if ( dirName == ".xvpics" )
                     {
                         continue;
@@ -69,22 +81,31 @@ void ProcessingEngine::ProcessDir( wxThread* owningThread_i, std::string parent_
                 } while ( dir.GetNext( &dirName ) );
             }
 
-            //if ( dir.HasFiles() )
-            //{
-            //    wxString fileName;
-            //    dir.GetFirst( &fileName, defaultFileMask );
-            //    do
-            //    {
-            //        // check if just this thread was asked to exit
-            //        if ( owningThread_i->TestDestroy() )
-            //            break;
+            if ( dir.HasFiles() )
+            {
+                wxString fileName;
+                dir.GetFirst( &fileName, defaultFileMask );
+                do
+                {
+                    {
+                        wxCriticalSectionLocker locker( wxGetApp().criticalSection );
+                        if ( wxGetApp().isShuttingDown() )
+                        {
+                            // Aplication is shutting down. Just exit.
+                            break;
+                        }
+                    }
 
-            //        fileName = directory_i + wxFileName::GetPathSeparator() + fileName;
-            //        MyFileWorker* newThread = new MyFileWorker( this, parent_i, fileName, semaphore );
-            //        semaphore.Wait();
-            //        newThread->Run();
-            //    } while ( dir.GetNext( &fileName ) );
-            //}
+                    // check if just this thread was asked to exit
+                    if ( owningThread_i->TestDestroy() )
+                        break;
+
+                    fileName = directory_i + wxFileName::GetPathSeparator() + fileName;
+                    MyFileWorker* newThread = new MyFileWorker( this, directory_i, fileName, semaphore );
+                    semaphore.Wait();
+                    newThread->Run();
+                } while ( dir.GetNext( &fileName ) );
+            }
         }
     }
 }
@@ -96,29 +117,37 @@ void ProcessingEngine::ProcessFile( std::string parent_i, std::string fileName_i
         wxFile file( fileName_i );
         if ( file.IsOpened() )
         {
-            //wxThreadEvent myFileEvent( wxEVT_THREAD, wxEVT_ADD_FILE_EVENT );
-            //ThreadInfo* fileEntry = new ThreadInfo( parent_i, fileName_i );
-            //myFileEvent.SetPayload( fileEntry );
-            //wxGetApp().QueueEvent( myFileEvent.Clone() );
-            //wxYield();
+            //wxLogMessage( "%d, Processing File %s", wxThread::GetCurrentId(), fileName_i );
             wxFileOffset length = file.Length();
             BufferType buffer( length );
             wxFileOffset read_bytes = file.Read( buffer.data(), length+1 );
             wxASSERT( read_bytes == length );
             wxASSERT( file.Eof() );
             std::vector<TagData> tagList;
-            ProcessData( buffer, tagList );
-            //wxThreadEvent myDataEvent( wxEVT_THREAD, wxEVT_ADD_DATA_EVENT );
-            //ThreadInfo* fileData = new ThreadInfo( fileName_i, tagList );
-            //myDataEvent.SetPayload( fileData );
-            //wxGetApp().QueueEvent( myDataEvent.Clone() );
-            //wxYield();
+            if ( ProcessFileData( buffer, tagList ) )
+            {
+                model->AddChildContainer( fileName_i );
+                for ( TagData tag : tagList )
+                {
+                    model->AddChild( fileName_i, tag.to_string() );
+                }
+                if ( fix )
+                {
+                    file.Close();
+                    FileProcessor process( fileName_i );
+                    process.ProcessFile();
+                }
+            }
         }
     }
 }
 
-void ProcessingEngine::ProcessData( const BufferType& buffer_i, TagListType& tagList )
+bool ProcessingEngine::ProcessFileData( const BufferType& buffer_i, TagListType& tagList )
 {
+    bool saveData = false;
+    int numberPictures = 0;
+    int numberUnmatchedSOIs = 0;
+
     const auto end = buffer_i.end();
     const auto beginning = buffer_i.cbegin();
     auto currentPosition = buffer_i.begin();
@@ -136,7 +165,7 @@ void ProcessingEngine::ProcessData( const BufferType& buffer_i, TagListType& tag
         bool isLittleEndian = false;
         currentPosition = std::find( currentPosition, end, JPEG_Tag::JPEG_Tag_ID );
 
-        if ( ( currentPosition  == end ) || ( currentPosition + 1 == end ) )
+        if ( ( currentPosition == end ) || ( currentPosition + 1 == end ) )
         {
             break;
         }
@@ -147,6 +176,22 @@ void ProcessingEngine::ProcessData( const BufferType& buffer_i, TagListType& tag
             continue;
         }
         TagData newTag( position, identifier );
+        if ( newTag.getTag().getTag() == JPEG_Tag::StartOfImage )
+        {
+            ++numberUnmatchedSOIs;
+        }
+        else if ( newTag.getTag().getTag() == JPEG_Tag::EndOfImage )
+        {
+            --numberUnmatchedSOIs;
+            if ( numberUnmatchedSOIs < 0 )
+            {
+                saveData = true;
+            }
+            else if ( numberUnmatchedSOIs == 0 )
+            {
+                ++numberPictures;
+            }
+        }
         if ( newTag.getTag().hasLength() )
         {
             wxByte byte0;
@@ -181,4 +226,10 @@ void ProcessingEngine::ProcessData( const BufferType& buffer_i, TagListType& tag
         }
         tagList.push_back( newTag );
     }
+    if ( ( numberPictures > 1 ) || ( numberUnmatchedSOIs != 0 ) )
+    {
+        saveData = true;
+    }
+
+    return saveData;
 }

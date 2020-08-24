@@ -15,6 +15,7 @@ public:
                   std::string parent_i, 
                   std::string filename_i,
                   wxSemaphore& semaphore_i );
+    virtual ~MyFileWorker() = default;
 
     virtual ExitCode Entry() override;
 

@@ -14,6 +14,7 @@ public:
 	virtual void addChild( MyPictureNodeInterface* child_i ) = 0;
 	virtual std::string getName() const = 0;
 	virtual bool isContainer() const = 0;
+	virtual void Print( std::ostream& outstream, std::string prefix_i ) const = 0;
 
 private:
 

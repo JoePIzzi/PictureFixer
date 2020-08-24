@@ -14,6 +14,7 @@ class MyDirWorker :
 {
 public:
     MyDirWorker( ProcessingEngine& handler_i, std::string parent_i, std::string filename_i );
+    ~MyDirWorker();
 
     virtual wxThread::ExitCode Entry() override;
 

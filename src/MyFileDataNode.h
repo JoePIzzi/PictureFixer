@@ -2,6 +2,7 @@
 #define MyFileDataNode_H
 
 #include <string>
+#include <ostream>
 
 #include "MyPictureNodeInterface.h"
 #include "MyContainerNode.h"
@@ -18,6 +19,7 @@ public:
     virtual void addChild( MyPictureNodeInterface* child_i ) override;
     virtual std::string getName() const override;
     virtual bool isContainer() const override { return false; }
+    void Print( std::ostream& outstream, std::string prefix_i ) const override;
 
 private:
     const MyContainerNode* parent;

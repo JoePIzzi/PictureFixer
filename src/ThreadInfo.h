@@ -12,22 +12,18 @@ class ThreadInfo :
 {
 public:
     ThreadInfo() = default;
-    ThreadInfo( std::string parent_i, std::string data_i ) :
+    ThreadInfo( const ThreadInfo& ) = default;
+    ThreadInfo& operator=( const ThreadInfo& rhs ) = default;
+
+    ThreadInfo( const wxDataViewItem& parent_i, const wxDataViewItem& child_i ) :
         parent( parent_i ),
-        entry( data_i )
+        entry( child_i )
     {
 
     }
 
-    ThreadInfo( std::string parent_i, std::vector<TagData>& data_i ) :
-        parent( parent_i ),
-        data( data_i )
-    {
-
-    }
-    std::string parent;
-    std::string entry;
-    std::vector<TagData> data;
+    wxDataViewItem parent;
+    wxDataViewItem entry;
 };
 
 

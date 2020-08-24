@@ -16,11 +16,11 @@
     <Filter Include="Models">
       <UniqueIdentifier>{1df8bdef-2079-495a-8790-ebfa0ffe9f47}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ProcessingEngines">
+      <UniqueIdentifier>{6a5a7f94-ab90-48dd-97f5-e8a1e2957827}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="MyFileDataNode.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="MainWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -28,9 +28,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MyFileWorker.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MyPictureModel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PictureFixerApp.cpp">
@@ -42,25 +39,28 @@
     <ClCompile Include="JPEG_Tag.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ProcessingEngine.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="TagData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ThreadInfo.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="MyContainerNode.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Models</Filter>
+    </ClCompile>
+    <ClCompile Include="MyFileDataNode.cpp">
+      <Filter>Models</Filter>
+    </ClCompile>
+    <ClCompile Include="MyPictureModel.cpp">
+      <Filter>Models</Filter>
+    </ClCompile>
+    <ClCompile Include="ProcessingEngine.cpp">
+      <Filter>ProcessingEngines</Filter>
+    </ClCompile>
+    <ClCompile Include="FileProcessor.cpp">
+      <Filter>ProcessingEngines</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MyPictureNodeInterface.h">
       <Filter>Models</Filter>
-    </ClInclude>
-    <ClInclude Include="MyFileDataNode.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MainWindow.h">
       <Filter>Header Files</Filter>
@@ -69,9 +69,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MyFileWorker.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MyPictureModel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PictureFixerApp.h">
@@ -83,16 +80,28 @@
     <ClInclude Include="JPEG_Tag.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ProcessingEngine.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="TagData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ThreadInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MyPictureModel.h">
+      <Filter>Models</Filter>
+    </ClInclude>
+    <ClInclude Include="MyFileDataNode.h">
+      <Filter>Models</Filter>
+    </ClInclude>
     <ClInclude Include="MyContainerNode.h">
+      <Filter>Models</Filter>
+    </ClInclude>
+    <ClInclude Include="ProcessingEngine.h">
+      <Filter>ProcessingEngines</Filter>
+    </ClInclude>
+    <ClInclude Include="FileProcessor.h">
+      <Filter>ProcessingEngines</Filter>
+    </ClInclude>
+    <ClInclude Include="MemDbg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -83,13 +83,14 @@ public:
 
     bool hasLength() const { return needsLength; }
     std::string to_string() const;
+    Marker_values getTag() const { return tag; }
 
 private:
     bool determineNeedsLength( Marker_values tag_i );
     
     Marker_values tag;
     bool needsLength;
-    static const std::vector<Marker_values> markersWithoutLength;
+    static const std::vector<Marker_values> markersWithLength;
 };
 
 #endif // !JPEG_Tag_H

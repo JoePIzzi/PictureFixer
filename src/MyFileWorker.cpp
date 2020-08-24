@@ -16,7 +16,7 @@ MyFileWorker::MyFileWorker( ProcessingEngine* handler_i,
                             std::string parent_i, 
                             std::string filename_i, 
                             wxSemaphore& semaphore_i ) :
-    wxThread( wxTHREAD_JOINABLE ),
+    wxThread( /*wxTHREAD_JOINABLE*/ ),
     semaphore( semaphore_i ),
     handler( handler_i ),
     parent( parent_i ),

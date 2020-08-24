@@ -11,10 +11,21 @@
 #endif
 
 #include "JPEG_Tag.h"
-#include <algorithm>
 
-const std::vector<JPEG_Tag::Marker_values> JPEG_Tag::markersWithoutLength = { JPEG_Tag::RST0, JPEG_Tag::RST1, JPEG_Tag::RST2,
-        JPEG_Tag::RST3, JPEG_Tag::RST4, JPEG_Tag::RST5,JPEG_Tag::RST6, JPEG_Tag::RST7, JPEG_Tag::StartOfImage, JPEG_Tag::EndOfImage, JPEG_Tag::StartOfScan };
+#include <algorithm>
+#include <string>
+#include <sstream>
+
+const std::vector<JPEG_Tag::Marker_values> JPEG_Tag::markersWithLength = { JPEG_Tag::NonDifferentialHuffmanBaslineDCT, JPEG_Tag::NonDifferentialHuffmanExtendedDCT,
+    JPEG_Tag::NonDifferentialHuffmanProgressiveDCT, JPEG_Tag::NonDifferentialHuffmanLosslessDCT, JPEG_Tag::DifferentialHuffmanDCT, 
+    JPEG_Tag::DifferentailHuffmanProgressiveDCT, JPEG_Tag::DifferentailHuffmanLosslessDCT, JPEG_Tag::JPEGExtensions, JPEG_Tag::NonDifferentialArithmeticExtendedDCT, 
+    JPEG_Tag::NonDifferentialArithmeticProgressiveDCT, JPEG_Tag::NonDifferentialArithmeticLosslessDCT, JPEG_Tag::DifferentialArithmeticSequentialDCT, 
+    JPEG_Tag::DifferentialArithmeticProgressiveDCT, JPEG_Tag::DifferentialArithmeticLosslessDCT, JPEG_Tag::DefineArithmeticCoding, JPEG_Tag::DefineQuantizationTable, 
+    JPEG_Tag::DefineNumberOfLines, JPEG_Tag::DefineRestartInterval, JPEG_Tag::DefineHierarchicalProgression, JPEG_Tag::ExpandReferenceComponent, 
+    JPEG_Tag::App0, JPEG_Tag::App1, JPEG_Tag::App2, JPEG_Tag::App3, JPEG_Tag::App4, JPEG_Tag::App5, JPEG_Tag::App6, JPEG_Tag::App7, JPEG_Tag::App8, 
+    JPEG_Tag::App9, JPEG_Tag::AppA, JPEG_Tag::AppB, JPEG_Tag::AppC, JPEG_Tag::AppD, JPEG_Tag::AppE, JPEG_Tag::AppF, JPEG_Tag::JPG0, JPEG_Tag::JPG1, 
+    JPEG_Tag::JPG2, JPEG_Tag::JPG3, JPEG_Tag::JPG4, JPEG_Tag::JPG5, JPEG_Tag::JPG6, JPEG_Tag::JPG7, JPEG_Tag::JPG8, JPEG_Tag::JPG9, JPEG_Tag::JPGA, 
+    JPEG_Tag::JPGB, JPEG_Tag::JPGC, JPEG_Tag::JPGD, JPEG_Tag::COMMENT };
 
 JPEG_Tag::JPEG_Tag() :
     tag( JPEG_Tag_ID ),
@@ -348,11 +359,17 @@ std::string JPEG_Tag::to_string() const
         text.assign( "COMMENT" );
         break;
 
+    default:
+        text.assign( "Unknown tag: " );
+        std::stringstream convert;
+        convert << "0x" << std::hex << tag;
+        text.append( convert.str() );
+        break;
     }
     return text;
 }
 
 bool JPEG_Tag::determineNeedsLength( Marker_values tag_i )
 {
-    return std::find( markersWithoutLength.begin(), markersWithoutLength.end(), tag ) == markersWithoutLength.end();
+    return std::find( markersWithLength.begin(), markersWithLength.end(), tag ) != markersWithLength.end();
 }
